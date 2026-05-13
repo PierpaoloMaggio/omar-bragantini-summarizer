@@ -194,6 +194,13 @@ async function main() {
 
   for (const entry of newOnes.reverse()) {
     console.log(`Processing ${entry.videoId} — ${entry.title}`);
+    if (/#shorts\b/i.test(entry.title)) {
+      console.log(`  skipped (title contains #shorts)`);
+      state.processed.push(entry.videoId);
+      if (state.processed.length > 200) state.processed = state.processed.slice(-200);
+      await saveState(state);
+      continue;
+    }
     try {
       const transcript = await fetchTranscript(entry.videoUrl);
       console.log(`  transcript length: ${transcript.length}`);
